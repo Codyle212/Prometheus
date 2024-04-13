@@ -1,0 +1,14 @@
+# for alert manager to send a email to gmail account
+route:
+  receiver: admin
+receivers:
+  - name: admin
+    # defines the smtp
+    email_configs:
+      - to: "my_email@gmail.com"
+        from: "example@gmail.com"
+        smarthost: smtp.gmail.com:587
+        auth_username: "example@gmail.com"
+        auth_identity: "example@gmail.com"
+        auth_password: "16_digit_pw_from_gmail"
+    # auth_passowrd: Gmail>Account>Security>Turn on 2 Step Verification> App Passwords>Custom:with Appname of Prometheus> copy and paste password
