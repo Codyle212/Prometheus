@@ -1,0 +1,32 @@
+groups:
+  - name: my-rules
+    rules:
+      - record: job:node_cpu_seconds:avg_idle
+        expr: avg without(cpu)(rate(node_cpu_seconds_total{mode="idle"}[5m]))
+
+      - alert: NodeExporterDown
+        expr: up(job="node_exporter") == 0
+        # checks if the evaluation cycle returns true for 1 minute before firing
+        for: 1m
+
+      # tracking latency of python application and create alert base on latency
+      - record: job:app_response_latency_seconds:rate1m
+        expr: rate(app_response_latency_seconds_sum[1m])/rate(app_response_latency_seconds_cound[1m]) #average latency in 1 minute
+      - alert: AppLatencyAbove5sec
+        expr: job:app_response_latency_seconds:rate1m >= 5
+        for: 2m
+        labels:
+          severity: critical
+        # extra information to can be used to troubleshoot
+        annotations:
+          summary: "Python app latency is over 5 second"
+          # $labels holds all key value pair of alert instance
+          description: "App latency of instance {{ $labels.instance }} of job {{ $labels.job }} is {{ $value }} for more than 2 minutes "
+          app_link: "http://localhost:8080/"
+      - record: job:app_response_latency_seconds:rate1m
+        expr: rate(app_response_latency_seconds_sum[1m])/rate(app_response_latency_seconds_cound[1m]) #average latency in 1 minute
+      - alert: AppLatencyAbove2sec
+        expr: 2 < job:app_response_latency_seconds:rate1m < 5
+        for: 2m
+        labels:
+          severtiy: warning
