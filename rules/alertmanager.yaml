@@ -1,14 +1,73 @@
-# for alert manager to send a email to gmail account
+global:
+  smtp_from: "example@gmail.com"
+  smtp_smarthost: smtp.gmail.com:587
+  smtp_auth_username: "example@gmail.com"
+  smtp_auth_identity: "example@gmail.com"
+  smtp_auth_password: "16_digit_pw_from_gmail"
+  # auth_passowrd: Gmail>Account>Security>Turn on 2 Step Verification> App Passwords>Custom:with Appname of Prometheus> copy and paste password
+
 route:
+  # fallback receiver
   receiver: admin
+  routes:
+    - match_re:
+        app_type: (linux|windows)
+      receiver: ss-admin
+      routes:
+        # Linux team
+        - match:
+            app_type: linux
+          # fallback receiver
+          receiver: linux-team-admin
+          routes:
+            - match:
+                severity: critical
+              receiver: linux-team-manager
+            - match:
+                severity: warning
+              receiver: linux-team-lead
+
+        # Windows team
+        - match:
+            app_type: windows
+          # fallback receiver
+          receiver: windows-team-admin
+          routes:
+            - match:
+                severity: critical
+              receiver: windows-team-manager
+            - match:
+                severity: warning
+              receiver: windows-team-lead
 receivers:
   - name: admin
-    # defines the smtp
+
     email_configs:
-      - to: "my_email@gmail.com"
-        from: "example@gmail.com"
-        smarthost: smtp.gmail.com:587
-        auth_username: "example@gmail.com"
-        auth_identity: "example@gmail.com"
-        auth_password: "16_digit_pw_from_gmail"
-    # auth_passowrd: Gmail>Account>Security>Turn on 2 Step Verification> App Passwords>Custom:with Appname of Prometheus> copy and paste password
+      - to: "admin@gmail.com"
+
+  - name: ss-admin
+    email_configs:
+      - to: "ss-admin@gmail.com"
+  - name: linux-team-admin
+    email_configs:
+      - to: "linux-team-admin@gmail.com"
+
+  - name: linux-team-lead
+    email_configs:
+      - to: "linux-team-lead@gmail.com"
+
+  - name: linux-team-manager
+    email_configs:
+      - to: "linux-team-manager@gmail.com"
+
+  - name: windows-team-admin
+    email_configs:
+      - to: "windows-team-admin@gmail.com"
+
+  - name: windows-team-lead
+    email_configs:
+      - to: "windows-team-lead@gmail.com"
+
+  - name: windows-team-manager
+    email_configs:
+      - to: "windows-team-manager@gmail.com"
