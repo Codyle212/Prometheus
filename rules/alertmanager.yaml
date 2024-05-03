@@ -9,9 +9,14 @@ global:
 route:
   # fallback receiver
   receiver: admin
+  group_wait: 40s #wait for other alert before sending notification, default 30s
+  group_interval: 5m #how long to wait before sending notification about new alerts added to group after previous notification
+  repeat_interval: 4h #how long to wait before sending notification again, if the notification is already sent
+  # Star Solution
   routes:
     - match_re:
         app_type: (linux|windows)
+      # fallback receiver
       receiver: ss-admin
       routes:
         # Linux team
@@ -19,6 +24,7 @@ route:
             app_type: linux
           # fallback receiver
           receiver: linux-team-admin
+          group_by: [catagory]
           routes:
             - match:
                 severity: critical
@@ -39,6 +45,43 @@ route:
             - match:
                 severity: warning
               receiver: windows-team-lead
+    # PEC Technologies
+    - match_re:
+        app_type: (python|go)
+      # fallback receiver
+      receiver: pec-admin
+      routes:
+        # Python team
+        - match:
+            app_type: python
+          # fallback receiver
+          receiver: python-team-admin
+          routes:
+            - match:
+                severity: critical
+              receiver: python-team-manager
+            - match:
+                severity: warning
+              receiver: python-team-lead
+
+        # Go team
+        - match:
+            app_type: go
+          # fallback receiver
+          receiver: go-team-admin
+          routes:
+            - match:
+                severity: critical
+              receiver: go-team-manager
+            - match:
+                severity: warning
+              receiver: go-team-lead
+inhibit_rules:
+  - source_match: #which alert should be in firing state to inhibit target alert
+      severity: "critical"
+    target_match: #which alert to inhibut if source alert is triggered
+      severity: "warning"
+    equal: ["app_type", "catagory"] # condition for inhibition, both source and target should have the smae app_type and catagory
 receivers:
   - name: admin
 
@@ -71,3 +114,31 @@ receivers:
   - name: windows-team-manager
     email_configs:
       - to: "windows-team-manager@gmail.com"
+
+  - name: pec-admin
+    email_configs:
+      - to: "pec-admin@gmail.com"
+
+  - name: python-team-admin
+    email_configs:
+      - to: "python-team-admin@gmail.com"
+
+  - name: python-team-lead
+    email_configs:
+      - to: "python-team-lead@gmail.com"
+
+  - name: python-team-manager
+    email_configs:
+      - to: "python-team-manager@gmail.com"
+
+  - name: go-team-admin
+    email_configs:
+      - to: "go-team-admin@gmail.com"
+
+  - name: go-team-lead
+    email_configs:
+      - to: "go-team-lead@gmail.com"
+
+  - name: go-team-manager
+    email_configs:
+      - to: "go-team-manager@gmail.com"
