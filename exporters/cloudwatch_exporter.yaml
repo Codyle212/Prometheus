@@ -1,0 +1,12 @@
+# To use install cloudwatch_exporter.jar and make sure java jdk is installed
+# have credential with permission cloudwatch:ListMetrics and cloudwatch:GetMetricStatistics
+# add the endpoint localhost:9106 to Prometheus.yml file with name of cloudwatch
+# start cloudwatch_exporter with command: /usr/bin/java -jar cloudwatch_exporter.jar 9106 cloudwatchexporter/cloudwatchexporter.yml
+
+region: us-east-1
+metrics:
+  aws_namespace: AWS/EC2
+  aws_metric_name: CPUUtilization
+  aws_dimensions: [InstancdId]
+  aws_statistics: [Average]
+# List of all cloudwatch metrics https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/viewing_metrics_with_cloudwatch.html
