@@ -1,0 +1,81 @@
+# To use visit <blackbox_export>:9115/probe?target=<endpoint_to_probe>&module=<module_name_down_below>
+# probe duration seconds is the time it take for probe to complete
+
+# Add the following to scrape_configs of prometheus.yaml
+# - job_name: 'blackbox_exporter'
+#     static_configs:
+#     - targets: ['localhost:9115']
+
+# To scrape target with config, add the following to prometheus.yaml
+# The endpoint to scrapte is prometheus.io/80, relabeling is required for this to work
+# - job_name: 'prometheus-website'
+#     static_configs:
+#     - targets:
+#       - prometheus.io
+#     metrics_path: /probe
+#     params:
+#       module:
+#       - http_ipv4
+
+modules:
+  # Target prometheus.io
+  http_2xx:
+    prober: http
+  http_ipv4:
+    prober: http
+    http:
+      # use ipv4 instead of ipv6
+      preferred_ip_protocol: ip4
+  # find if body of the http contains some words
+  http_find_prom:
+    prober: http
+    http:
+      preferred_ip_protocol: ip4
+      # fails if the body does not match regular expression
+      fail_if_body_not_matches_regexp:
+        - "chocolate"
+  # makes a http post request to the endpoint
+  http_post_2xx:
+    prober: http
+    http:
+      method: POST
+  # Target: localhost:8080
+  tcp_connect:
+    prober: tcp
+  pop3s_banner:
+    prober: tcp
+    tcp:
+      query_response:
+        - expect: "^+OK"
+      tls: true
+      tls_config:
+        insecure_skip_verify: false
+  ssh_banner:
+    prober: tcp
+    tcp:
+      query_response:
+        - expect: "^SSH-2.0-"
+  irc_banner:
+    prober: tcp
+    tcp:
+      query_response:
+        - send: "NICK prober"
+        - send: "USER prober prober prober :prober"
+        - expect: "PING :([^ ]+)"
+          send: "PONG ${1}"
+        - expect: "^:[^ ]+ 001"
+  # requires windows admin privilege or linux root user
+  icmp:
+    prober: icmp
+    # icmp:
+    #   preferred_ip_protocol: ip4
+
+  # Probe DNS server and target should a DNS server such 8.8.8.8(google dns)
+  # Can also be use to check if the correct result on probing
+  dns_example:
+    prober: dns
+    dns:
+      #default UDP
+      transport_protocol: TCP
+      preferred_ip_protocol: ip4
+      query_name: "www.google.ca"
