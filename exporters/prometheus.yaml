@@ -60,7 +60,7 @@ scrape_configs:
           - http://prometheus.io # Target to probe with http
           - https://prometheus.io # Target to probe with https
           - http://example.com:8080 # Target to probe with http on port 8080
-    # the relabling config should be followed in sequence
+    # the relabling config should be followed in sequence, source_labels is passed into target labels
     relabel_configs:
       - source_labels: [__address__]
         target_label: __param_target
