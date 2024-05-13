@@ -1,0 +1,13 @@
+# To use file sd in prometheus , define the following in scrape config of prometheus.yml
+# - job_name: 'node_exporter'
+#   file_sd_configs:
+#   - files:
+#     - file_sd.yml
+
+# SD allows us to add additional labels to target labels
+# prometheus watch changes to this file and update target accordingly
+- targets:
+    - localhost:9100
+  labels:
+    team: "development"
+    region: "Mumbai"
