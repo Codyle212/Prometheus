@@ -1,4 +1,4 @@
-# To use visit <blackbox_export>:9115/probe?target=<endpoint_to_probe>&module=<module_name_down_below>
+# To use visit <blackbox_exporter>:9115/probe?target=<endpoint_to_probe>&module=<module_name_down_below>
 # probe duration seconds is the time it take for probe to complete
 
 # Add the following to scrape_configs of prometheus.yaml
