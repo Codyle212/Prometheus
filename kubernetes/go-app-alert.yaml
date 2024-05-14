@@ -1,0 +1,29 @@
+apiVersion: monitoring.coreos.com/v1alpha1
+kind: AlertmanagerConfig
+metadata:
+  name: alertmanager-config
+  labels:
+    resource: prometheus
+spec:
+  route:
+    groupBy: ["severity"]
+    groupWait: 30s
+    groupInterval: 5m
+    repeatInterval: 12h
+    receiver: "webhook"
+  receivers:
+    - name: "webhook"
+      webhookConfigs:
+        - url: "http://example.com/"
+    # Sample Email Configuration
+    # - name: "email"
+    #   emailConfigs:
+    #     - to: "your-email@example.com"
+    #       from: "alertmanager@example.com"
+    #       smarthost: "smtp.gmail.com:587" # SMTP server address and port
+    #       authUsername: "your-smtp-username"
+    #       authPassword:
+    #         name: "your-smtp-auth"
+    #         key: "your-smtp-password"
+    #       authIdentity: "alertmanager@example.com"
+    #       sendResolved: true
