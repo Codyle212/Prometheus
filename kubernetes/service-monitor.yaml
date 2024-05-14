@@ -1,0 +1,17 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    # first 1 labels are from prometheus crd
+    release: prometheus
+    app: go-app-service-monitor
+  name: go-app-service-monitor
+spec:
+  jobLabel: job
+  endpoints:
+    - interval: 15s
+      port: go-app-exporter-port
+      path: /metrics
+  selector:
+    matchLabels:
+      app: go-app-exporter-service
