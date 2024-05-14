@@ -1,0 +1,19 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  labels:
+    release: prometheus
+  name: go-app-rules
+spec:
+  groups:
+    - name: go-app
+      rules:
+        - alert: Go application is down for more than 2 minutes
+          expr: up == 0
+          for: 2m
+          labels:
+            severity: critical
+            app_type: go
+          annotations:
+            summary: "Go app is down for more than 2 minutes."
+            description: "App latency of instance {{ $labels.instance }} of job {{ $labels.job }} is down for more than 2 minutes"
